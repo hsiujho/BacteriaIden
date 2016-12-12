@@ -1,0 +1,38 @@
+---
+title: "Iris PCA"
+author: "Hsiu J. Ho"
+date: "2016年5月18日"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+require(BacteriaIden)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,dpi=600}
+data("iris")
+
+y0=iris[,-5]
+y1=matrix(colnames(y0),ncol=1)
+rownames(y1)=paste0("char",1:4)
+colnames(y1)="Character"
+colnames(y0)=rownames(y1)
+y2=data.frame(Speices=iris[,5],A=0,B=1,stringsAsFactors = T)
+
+iris_phylo=phyloseq(
+otu_table(y0,taxa_are_rows = F)
+,tax_table(y1)
+,sample_data(y2)
+)
+
+p1=myord(phylo=iris_phylo,gv.name="Speices",plot.ellipse=T,plot.spider=T)
+
+win.graph()
+p1+scale_color_manual(breaks = c("setosa", "versicolor", "virginica")
+                      ,values=c("red", "blue","black"),name="Speices")+ggtitle("IRIS")+xlab("xlab")+theme_bw()
+
+```
+
+
+

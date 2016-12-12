@@ -1,0 +1,2 @@
+exportPattern("^[[:alpha:]]+")
+#importFrom(dplyr,readr,R.utils,reshape2,magrittr,parallel,Biostrings)
