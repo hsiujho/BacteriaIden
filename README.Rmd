@@ -1,0 +1,20 @@
+---
+title: "README"
+author: "Hsiu J. Ho"
+date: "2016年12月12日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+這是一個資料結構為phyloseq的菌相分析套件. 有一些函數會運用其他軟體及資料庫, 如mothur, userach, greengene等等, 使用時請先安裝.
+
+安裝本套件
+```{r,eval=FALSE}
+require(devtools)
+install_github("hsiujho/BacteriaIden")
+```
+
+
