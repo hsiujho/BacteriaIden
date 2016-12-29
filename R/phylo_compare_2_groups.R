@@ -10,7 +10,8 @@ phylo_compare_2_groups=function(phylo,group.var){
   if(class(phylo)!="phyloseq") stop("The class of phylo is not phyloseq")
   if(length(group.var)!=1) stop("length of group.var must be 1")
   if(all(sample_variables(phylo)!=group.var)) stop("phylo not contain group variable")
-  gv=get_variable(phylo,group.var) %>>% factor()
+  gv=get_variable(phylo,group.var) %>>% as.character() %>>% factor()
+  sample_data(phylo)$gv=gv
   #  print(gv)
   #  print(nsamples(phylo))
   #  cat(sprintf("length(levels(gv))=%i\n",length(levels(gv))))
@@ -18,13 +19,13 @@ phylo_compare_2_groups=function(phylo,group.var){
 
   e0 = phylo %>>% psmelt()
 
-  e1=e0 %>>% group_by(OTU) %>>% do(k0=anova(lm(Abundance~group,data=.))$`Pr(>F)`[1]) %>>% summarise(OTU,pvalue=k0) %>>% setNames(c("ID","pvalue_t.test"))
+  e1=e0 %>>% group_by(OTU) %>>% do(k0=anova(lm(Abundance~gv,data=.))$`Pr(>F)`[1]) %>>% summarise(OTU,pvalue=k0) %>>% setNames(c("ID","pvalue_t.test"))
 
-  e2=e0 %>>% group_by(OTU,group) %>>% summarise(Mean=mean(Abundance)) %>>% dcast(OTU~group,value.var="Mean") %>>% setNames(c("ID",paste0(colnames(.)[-1],"_mean")))
+  e2=e0 %>>% group_by(OTU,gv) %>>% summarise(Mean=mean(Abundance)) %>>% dcast(OTU~gv,value.var="Mean") %>>% setNames(c("ID",paste0(colnames(.)[-1],"_mean")))
 
-  e3=e0 %>>% group_by(OTU) %>>% do(k0=wilcox.test(Abundance~group,data=.,exact = FALSE)) %>>% summarise(OTU,pvalue=k0$p.value) %>>% setNames(c("ID","pvalue_wilcox.test"))
+  e3=e0 %>>% group_by(OTU) %>>% do(k0=wilcox.test(Abundance~gv,data=.,exact = FALSE)) %>>% summarise(OTU,pvalue=k0$p.value) %>>% setNames(c("ID","pvalue_wilcox.test"))
 
-  e4=e0 %>>% group_by(OTU,group) %>>% summarise(Median=median(Abundance)) %>>% dcast(OTU~group,value.var="Median") %>>% setNames(c("ID",paste0(colnames(.)[-1],"_median")))
+  e4=e0 %>>% group_by(OTU,gv) %>>% summarise(Median=median(Abundance)) %>>% dcast(OTU~gv,value.var="Median") %>>% setNames(c("ID",paste0(colnames(.)[-1],"_median")))
 
   e5=left_join(e2,e1,by="ID") %>>% left_join(e4,by="ID") %>>% left_join(e3,by="ID")
 
@@ -38,12 +39,21 @@ phylo_compare_2_groups=function(phylo,group.var){
 
   if(any(regexpr("Description",colnames(e6))!=-1)){
     ff0=lapply(levels(gv),function(x){
+#      x="C02"
       f0=dplyr::filter(e6,Significant==x) %>>% dplyr::select(ID,metadata_COG_Category,metadata_COG_Description)
-
+      if(nrow(f0)==0) return()
       f1=gsub("[[:punct:]]"," ",f0$metadata_COG_Description) %>>% strsplit(" ") %>>% unlist() %>>% (gsub(",","",.)) %>>% table() %>>% data.frame() %>>% arrange(desc(Freq)) %>>% setNames(c("string",x)) %>>% mutate_each(funs(as.character),string) %>>% dplyr::filter(string!="")
       return(f1)
     })
-    outp$textMining=full_join(ff0[[1]],ff0[[2]],by="string")
+    if(!is.null(ff0[[1]])&is.null(ff0[[2]])) {
+      outp$textMining=ff0[[1]]
+    }
+    if(is.null(ff0[[1]])&!is.null(ff0[[2]])) {
+      outp$textMining=ff0[[2]]
+    }
+    if(!is.null(ff0[[1]])&!is.null(ff0[[2]])) {
+      outp$textMining=full_join(ff0[[1]],ff0[[2]],by="string")
+    }
   }
   return(outp)
 }

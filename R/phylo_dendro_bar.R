@@ -41,8 +41,11 @@ phylo_dendro_bar=function(phylo,group_var,ranklv="Phylum",topn=6,xlim,ylim,legen
         rownames(a6)=sample_names(phylo)
         #        print(a6)
         a7=a6[colnames(a4),]
+        c0=ape::as.phylo(hc)
+        c0$edge.length=c0$edge.length/max(c0$edge.length)*50
+
         par(mar=c(1,1,1,1),xpd=NA)
-        plot(ape::as.phylo(hc),x.lim=xlim,y.lim=ylim, tip.color =
+        plot(c0,x.lim=xlim,y.lim=ylim, tip.color =
                as.numeric(a7))
         barplot(a4[,hc$order],col=colorv[1:min(topn,length(colorv))]
                 ,horiz=T,yaxt="n",add=T,offset = xlim[2]-100,

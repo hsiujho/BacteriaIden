@@ -70,7 +70,8 @@ phylo_LEfSe=function(
 
   cladofn=sprintf("%sz.png",lefse_path)
   if(file.exists(cladofn)) {
-    file.copy(from=cladofn,to=sprintf("%sLEfSe_%s.png",save_path,g1),overwrite=T)
+#    file.copy(from=cladofn,to=sprintf("%sLEfSe_%s.png",save_path,g1),overwrite=T)
+    file.copy(from=cladofn,to=file.path(save_path,sprintf("LEfSe_%s.png",g1)),overwrite=T)
     file.remove(sprintf("%sz.png",lefse_path))
   }
 
@@ -86,6 +87,9 @@ phylo_LEfSe=function(
   #L7$V1[!L7$V1%in%L8$class1]
   #L8$class[!L8$class1%in%L7$V1]
 
-  saveRDS(list(group.means=L8,meandiff=L9,LEfSe=L7),file=sprintf("%sLEfSe_%s.rds",save_path,g1))
+  saveRDS(list(group.means=L8,meandiff=L9,LEfSe=L7)
+#          ,file=sprintf("%sLEfSe_%s.rds",save_path,g1)
+           ,file=file.path(save_path,sprintf("LEfSe_%s.rds",g1))
+          )
   return()
 }
