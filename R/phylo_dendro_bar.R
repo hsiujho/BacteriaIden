@@ -10,7 +10,7 @@ phylo_dendro_bar=function(phylo,group_var,ranklv="Phylum",topn=6,xlim,ylim,legen
     phylo%<>%tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
   }
   phylo%<>%transform_sample_counts(function(x)x/sum(x)*100)
-  hc <- otu_table(phylo)@.Data %>% t() %>% dist() %>% hclust(method=method)
+  hc <- otu_table(phylo)@.Data %>% t() %>% vegdist() %>% hclust(method=method)
 
   b0=taxa_sums(phylo) %>>% sort.default(decreasing=T) %>>% names() %>>% "["(1:topn)
   a1=prune_taxa(taxa_names(phylo)%in%b0,phylo)
