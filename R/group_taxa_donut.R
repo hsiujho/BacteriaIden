@@ -56,7 +56,9 @@ group_taxa_donut=function(phylo,group.varn,ranklv="Phylum",topn=5,facet.row=".",
     scale_x_continuous(name=ifelse(group.varn=="dummy_var","",group.varn)
                        ,breaks=1:nlevels(gv)+x_shift
                        ,labels=levels(gv),limits=c(0,nlevels(gv)+x_shift+.5))+
-    scale_fill_discrete(name=ranklv)
+    scale_fill_discrete(name=ranklv)+
+    theme(legend.background=element_blank(),
+          plot.background = element_blank())
   if(facet.row!="."|facet.col!=".")
     p1=p1+facet_grid(formula(sprintf("%s~%s",facet.row,facet.col)))
 

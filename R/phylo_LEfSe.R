@@ -10,6 +10,7 @@ phylo_LEfSe=function(
   ,g1="ph_lv" #分組變數名稱, 物件中的sample_data有的欄位
   ,save_path="E:\\Biom\\20150901 biom_analy\\20151019 GF SA\\" #輸出存檔路徑, LEfSe_"g1".png, LEfSe_"g1".rds
   ,lefse_path="E:\\soft\\python\\LEfSe\\lefse-db64b6287cd6\\home\\ubuntu\\lefse_to_export\\"
+#  ,figure_format="png" #png,pdf,svg
   ,labeled_stop_lev=7
   ,abrv_start_lev=5
   ,abrv_stop_lev=7
@@ -39,6 +40,7 @@ phylo_LEfSe=function(
   L5=mutate_each(L4,funs(as.numeric),-class)%>%group_by(class)%>%summarise_each(funs(sum))
   L6=rbind(c("group",as.character(get_variable(phylo,g1))),as.matrix(L5))
 
+  figure_format=c("png","pdf","svg")
   prodClado=function(x6){
     write.table(x6,file=sprintf("%sz.txt",lefse_path), append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F, col.names = F, qmethod = c("escape", "double"),fileEncoding = "")
 
@@ -57,8 +59,10 @@ phylo_LEfSe=function(
                  , sprintf("--title \"\"")
     )
 
-    tx1="python plot_cladogram.py z.res z.png --dpi 300 --format png"
-    system(sprintf('%s %s',tx1,para), intern =T )
+    for(i in 1:3){
+      tx1=sprintf("python plot_cladogram.py z.res z.%s --dpi 300 --format %s",figure_format[i],figure_format[i])
+      system(sprintf('%s %s',tx1,para), intern =T )
+    }
 
     #LEfSe輸出存放路徑
     outp=read.delim(sprintf("%sz.res",lefse_path), header =F,stringsAsFactors=F)
@@ -68,11 +72,13 @@ phylo_LEfSe=function(
 
   L7=prodClado(L6) %>% mutate(pvalue=as.numeric(ifelse(V5=="-","",V5)),lv=nchar(as.vector(V1))-nchar(gsub("\\.","",as.vector(V1))),Rank=rank_lv[lv+1]) %>% arrange(lv,V3,pvalue)%>%dplyr::rename(Taxonomy=V1,Group=V3,Statistic=V4)
 
-  cladofn=sprintf("%sz.png",lefse_path)
-  if(file.exists(cladofn)) {
-#    file.copy(from=cladofn,to=sprintf("%sLEfSe_%s.png",save_path,g1),overwrite=T)
-    file.copy(from=cladofn,to=file.path(save_path,sprintf("LEfSe_%s.png",g1)),overwrite=T)
-    file.remove(sprintf("%sz.png",lefse_path))
+  for(i in 1:3){
+    cladofn=sprintf("%sz.%s",lefse_path,figure_format[i])
+    if(file.exists(cladofn)) {
+  #    file.copy(from=cladofn,to=sprintf("%sLEfSe_%s.png",save_path,g1),overwrite=T)
+      file.copy(from=cladofn,to=file.path(save_path,sprintf("LEfSe_%s.%s",g1,figure_format[i])),overwrite=T)
+      file.remove(sprintf("%sz.%s",lefse_path,figure_format[i]))
+    }
   }
 
   L8=melt(L5,id.vars="class", measure.vars=colnames(L5)[colnames(L5)!="class"],variable.name = "ID",value.name = "value") %>% mutate_each(funs(as.character),ID) %>% left_join(data.frame(ID=sample_names(phylo),g1=get_variable(phylo,g1),stringsAsFactors = F,check.names = F),by="ID") %>% group_by(class,g1) %>% summarise(mean=mean(value)) %>% dcast(class~g1,value.var ="mean")
