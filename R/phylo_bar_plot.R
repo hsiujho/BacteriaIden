@@ -42,11 +42,15 @@ phylo_bar_plot=function(
 
   p = ggplot(arrange_(p5,fill), aes_string(x = tail(x,1), y = "Abundance", fill = fill))
   p = p + geom_bar(stat = "identity", position = "stack", color = "black")
-  p = p + theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust=0.5))
+  p = p + theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust=0.5))+
+    theme(legend.background=element_blank(),
+          plot.background = element_blank())
 
   blank_theme =theme(axis.title.y=element_blank()
                      ,axis.ticks.y=element_blank()
-                     ,axis.text.y=element_blank())
+                     ,axis.text.y=element_blank()
+                     ,legend.background=element_blank()
+                     ,plot.background = element_blank())
   pie=ggplot(arrange_(p5,fill),aes_string(x="factor(1)",y="Abundance",fill=fill))+
     geom_bar(stat = "identity", color = "black",width = 1)+
     coord_polar(theta="y")+ylab("Relative abundance")+

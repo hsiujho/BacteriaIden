@@ -26,5 +26,7 @@ phylo_alpha_div_boxplot=function(phylo,ranklv,group_var){
     p1=ggplot(a1,aes_string(x=factor(""),y="value")) +geom_boxplot()+facet_wrap(~Index, scales = "free_y",nrow=1)+xlab("")+ylab(ylabtext)
     a2=dcast(a1,SampleID~Index)
   }
-  return(list(table=a2,boxplot=p1))
+  return(list(table=a2,boxplot=p1+
+                theme(legend.background=element_blank(),
+                      plot.background = element_blank())))
 }

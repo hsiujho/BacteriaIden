@@ -62,7 +62,9 @@ Community_association_analysis=function(phylo,ranklv,y,Is_y_discrete=F){
     arrange(Significant,sign,p1)
 
   ##Volcano plot
-  vol=ggplot(a1,aes(x=beta1,y=-log10(p1),colour=Significant))+geom_point(alpha=0.5)+xlab("beta")+ylab("-log10(p-value)")
+  vol=ggplot(a1,aes(x=beta1,y=-log10(p1),colour=Significant))+geom_point(alpha=0.5)+xlab("beta")+ylab("-log10(p-value)")+
+    theme(legend.background=element_blank(),
+          plot.background = element_blank())
 
   ##Scatter plot
 
@@ -76,7 +78,9 @@ Community_association_analysis=function(phylo,ranklv,y,Is_y_discrete=F){
 
     fig1=ggplot(data = a5, aes_string(x = "Abundance", y = y, label=y)) + ggtitle(ifelse(x==1,"Positive beta","Negative beta")) +
       geom_point() + facet_wrap(~lab,ncol=5,scales="free_x") +
-      xlab("Relative Abundance (%)") + ylab(y)
+      xlab("Relative Abundance (%)") + ylab(y)+
+      theme(legend.background=element_blank(),
+            plot.background = element_blank())
     if(Is_y_discrete){
       fig2=fig1+geom_smooth(method="glm", method.args = list(family = "binomial"),se=FALSE)
     } else {
