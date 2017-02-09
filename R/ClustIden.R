@@ -1,6 +1,6 @@
 
 ClustIden=function(ID,R1,R2,gz=T,minlength=450,maxlength=550
-                   ,wdpath="E:/fastq",savepath,cores=detectCores()-1){
+                   ,wdpath="E:/fastq",savepath,cores=detectCores()-1,nparts=2){
 
   setwd(wdpath)
 
@@ -41,16 +41,20 @@ ClustIden=function(ID,R1,R2,gz=T,minlength=450,maxlength=550
 
   #分割檔案, 避開記憶體的限制
 
-  system('perl fasta-splitter.pl --n-parts 2 A.merged.trim.fasta')
+  system(sprintf('perl fasta-splitter.pl --n-parts %i A.merged.trim.fasta',nparts))
 
   #檢測chimera
 
-  system(sprintf('usearch -uchime_ref A.merged.trim.part-1.fasta -db rdp_gold.fa -nonchimeras A.merged.trim.part-1.fasta.nch -strand plus -mindiv 3 -threads %i',cores))
-  system(sprintf('usearch -uchime_ref A.merged.trim.part-2.fasta -db rdp_gold.fa -nonchimeras A.merged.trim.part-2.fasta.nch -strand plus -mindiv 3 -threads %i',cores))
+  for(k in 1:nparts){
+    system(sprintf('usearch -uchime_ref A.merged.trim.part-%i.fasta -db rdp_gold.fa -nonchimeras A.merged.trim.part-%i.fasta.nch -strand plus -mindiv 3 -threads %i',k,k,cores))
+  }
 
   #合併檢測後的序列
 
-  shell('type A.merged.trim.part-1.fasta.nch A.merged.trim.part-2.fasta.nch > A.merged.trim.fas.nch')
+  sprintf("A.merged.trim.part-%i.fasta.nch",1:nparts) %>%
+    paste(collapse=" ") %>>%
+    (sprintf('type %s > A.merged.trim.fas.nch',.)) %>>%
+    shell()
 
   #non-chimera後的序列摘要
 
