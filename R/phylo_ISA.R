@@ -13,7 +13,7 @@ phylo_ISA=function(phylo,group_var
   } else {
     stop("group_var is missing.")
   }
-  
+
   if(any(rank_names(phylo)==ranklv)){
     phylo%<>%tax_glom(ranklv,NArm=NArm)%>>%(prune_taxa(taxa_sums(.)>0,.))
   } else {
@@ -23,19 +23,22 @@ phylo_ISA=function(phylo,group_var
   if(toRA){
     phylo%<>%transform_sample_counts(function(x)x/sum(x)*100)
   }
-  
-  bp1=otu_table(phylo)@.Data %>>% t() %>>%data.frame(check.names=F)
-  bp2=indicspecies::multipatt(bp1, gv, control = how(nperm=9999)) 
-  bp3=bp2$sign %>>% rownames_to_column("OTU") %>>% 
-    filter(p.value<0.05) %>>% arrange(index,p.value)
 
-  bp4=psmelt(phylo) %>>% 
+  bp1=otu_table(phylo)@.Data %>>% t() %>>%data.frame(check.names=F)
+  bp2=indicspecies::multipatt(bp1, gv, control = how(nperm=9999))
+  bp3=bp2$sign %>>% rownames_to_column("OTU") %>>%
+    filter(p.value<0.05) %>>% arrange(index,p.value) %>>%
+    left_join(tax_table(phylo)@.Data %>>%
+                as.data.frame(stringsAsFactors=F) %>>%
+                rownames_to_column("OTU"),by="OTU")
+
+  bp4=psmelt(phylo) %>>%
     mutate_(tmp=ranklv) %>>%
     filter(OTU%in%bp3$OTU&tmp!="") %>>%
     mutate(OTU=factor(OTU,levels=bp3$OTU)) %>>%
     arrange(OTU) %>>%
     mutate(tmp=factor(tmp,levels=tmp[!duplicated(tmp)]))
-  
+
   bp5=ggplot(bp4,aes_string(x=group_var,y="Abundance"))+
     geom_boxplot()+
     facet_wrap(~tmp,scales = "free_y",ncol=4)+
