@@ -11,8 +11,13 @@
 #
 # a0=phylo_DMM(phylo)
 
-phylo_DMM=function(phylo,ranklv="Genus",NArm = F){
+phylo_DMM=function(phylo,ranklv="Genus",NArm = F
+                   ,mothur_path="E:/soft/Mothur.win_64_1.39.5/mothur",Num_thread=1){
+
   c0=tax_glom(phylo,ranklv,NArm = NArm)
+  if(!NArm){
+    c0=add_label_to_unknown_taxon(c0)
+  }
   c1=otu_table(c0)@.Data %>>% t()
 
   shared.df<-as.data.frame(c1)
@@ -21,22 +26,19 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F){
   Group<-data.frame(Group=rownames(shared.df))
   label<-data.frame(label=rep(0.05,nrow(shared.df)))
   out.tsv<-data.frame(label,Group,numOtu,shared.df)
-  mothur_path="E:/soft/Mothur.win_64_1.39.5/mothur"
-  write.table(out.tsv,file=file.path(mothur_path,"co.genus.shared"),sep="\t",row.names=FALSE,quote=FALSE)
+
+  write.table(out.tsv,file=file.path(mothur_path,"dmm.shared"),sep="\t",row.names=FALSE,quote=FALSE)
 
   #餵給get.communitytype
   #https://www.mothur.org/wiki/Get.communitytype
 
   #E:\soft\Mothur.win_64_1.39.5\mothur
   #執行 mothur > get.communitytype(shared=mouse.fmt.genus.shared)
+
   origin_wd=getwd()
   setwd(mothur_path)
-  system('mothur "#get.communitytype(shared=co.genus.shared)"',intern = T)
+  system(sprintf('mothur "#get.communitytype(shared=dmm.shared, processors=%i)"',Num_thread),intern = T)
   setwd(origin_wd)
-
-  if(!NArm){
-    c0=add_label_to_unknown_taxon(c0)
-  }
 
   t0=tax_table(c0)@.Data %>>%
     data.frame(stringsAsFactors=F) %>>%
@@ -71,6 +73,7 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F){
   }) %>>% setNames(f1)
 
   ##移除mothur生成的輸出資料
+
   list.files(mothur_path,pattern="\\.mix\\.posterior",full.names = T) %>>%
     file.remove()
   list.files(mothur_path,pattern="\\.mix\\.relabund",full.names = T) %>>%
@@ -79,7 +82,7 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F){
     file.remove()
   list.files(mothur_path,pattern="\\.logfile",full.names = T) %>>%
     file.remove()
-  file.path(mothur_path,"co.genus.shared") %>>% file.remove()
+  file.path(mothur_path,"dmm.shared") %>>% file.remove()
 
   ##
   return(list(fit=f2,posterior=d2,relabund=e2,taxon=t0))
