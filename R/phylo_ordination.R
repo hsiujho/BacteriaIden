@@ -12,7 +12,7 @@ phylo_ordination=function(phylo,ranklv,toRA=T
 ){
   if(!missing(ranklv)){
     if(any(rank_names(phylo)==ranklv)){
-      phylo%<>%tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
+      phylo%<>%my_tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
     }
   }
   if(toRA){
