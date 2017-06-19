@@ -108,7 +108,7 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F
 
   c2=transform_sample_counts(c0,function(x)x/sum(x)*100)
   c3=melt(otu_table(c2),varnames=c("OTUID","Sample"),value.name = "Abundance") %>>%
-      mutate_each(funs(as.character),OTUID,Sample)
+      mutate_at(funs(as.character),.vars=c("OTUID","Sample"))
 
   relabund=lapply(g2,function(e1){
     # e1=g2$dmm.0.05.pam.3.mix.posterior
