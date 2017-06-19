@@ -56,8 +56,8 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F
   e1=sort(list.files(mothur_path,pattern="\\.mix\\.relabund",full.names = F))
   e2=lapply(e0,function(x){
     e3=read.table(x,header = T,stringsAsFactors=F)
-    e4=grepl("Partition_\\d_\\d+", colnames(e3))
-    e5=regmatches(colnames(e3)[e4], regexpr("Partition_\\d", colnames(e3)[e4]))
+    e4=grepl("Partition_\\d+_\\d+", colnames(e3))
+    e5=regmatches(colnames(e3)[e4], regexpr("Partition_\\d+", colnames(e3)[e4]))
     colnames(e3)[e4]=e5
     return(e3)
   }) %>>% setNames(e1)
@@ -88,8 +88,8 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F
   system('mothur "#get.communitytype(shared=dmm.shared,method=pam)"',intern = T)
   setwd(origin_wd)
 
-  g0=sort(list.files(mothur_path,pattern="\\.pam\\.\\d\\.mix\\.posterior",full.names = T))
-  g1=sort(list.files(mothur_path,pattern="\\.pam\\.\\d\\.mix\\.posterior",full.names = F))
+  g0=sort(list.files(mothur_path,pattern="\\.pam\\.\\d+\\.mix\\.posterior",full.names = T))
+  g1=sort(list.files(mothur_path,pattern="\\.pam\\.\\d+\\.mix\\.posterior",full.names = F))
   g2=lapply(g0,function(x){
     read.table(x,header = T,stringsAsFactors=F)
   }) %>>% setNames(g1)
@@ -113,7 +113,7 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F
   relabund=lapply(g2,function(e1){
     # e1=g2$dmm.0.05.pam.3.mix.posterior
     e2=colnames(e1) %>>%
-      (regmatches(., regexpr("Partition_\\d", .)))
+      (regmatches(., regexpr("Partition_\\d+", .)))
     i0=e1 %>>%
       rownames_to_column("Sample") %>>%
       melt(id.vars="Sample", measure.vars=e2, variable.name="Enterotype",value.name="Y") %>>%
@@ -127,14 +127,14 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F
       dcast(OTUID~Enterotype,value.var="Mean") %>>%
       (left_join(t0,.,by="OTUID"))
     i2=colnames(i1) %>>%
-      (regmatches(., regexpr("Partition_\\d", .)))
+      (regmatches(., regexpr("Partition_\\d+", .)))
     i1$Difference=abs(apply(i1[,i2,drop=F],1,max)-apply(i1[,i2,drop=F],1,min))
     i3=arrange(i1,desc(Difference))
     return(i3)
   }) %>>% setNames(sub("posterior","relabund",names(g2)))
 
   ##移除mothur生成的輸出資料
-  list.files(mothur_path,pattern="\\.pam\\.\\d\\.mix\\.posterior",full.names = T) %>>%
+  list.files(mothur_path,pattern="\\.pam\\.\\d+\\.mix\\.posterior",full.names = T) %>>%
     file.remove()
   list.files(mothur_path,pattern="\\.pam\\.mix\\.",full.names = T) %>>%
     file.remove()
