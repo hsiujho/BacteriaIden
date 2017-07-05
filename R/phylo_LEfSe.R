@@ -37,7 +37,8 @@ phylo_LEfSe=function(
     return(x2)
   }) %>% bind_rows()
 
-  L5=mutate_each(L4,funs(as.numeric),-class)%>%group_by(class)%>%summarise_each(funs(sum))
+  # L5=mutate_each(L4,funs(as.numeric),-class)%>%group_by(class)%>%summarise_each(funs(sum))
+  L5=group_by(L4,class)%>%mutate_all(funs(as.numeric))%>%summarise_all(funs(sum))
   L6=rbind(c("group",as.character(get_variable(phylo,g1))),as.matrix(L5))
 
   figure_format=c("png","pdf","svg")
@@ -63,6 +64,10 @@ phylo_LEfSe=function(
       tx1=sprintf("python plot_cladogram.py z.res z.%s --dpi 300 --format %s",figure_format[i],figure_format[i])
       system(sprintf('%s %s',tx1,para), intern =T )
     }
+    # BarChart of LDA score (log10)
+    system("python plot_res.py z.res BarChart.png --dpi 300",intern =T)
+    system("python plot_res.py z.res BarChart.pdf --format pdf",intern =T)
+    system("python plot_res.py z.res BarChart.svg --format svg",intern =T)
 
     #LEfSe輸出存放路徑
     outp=read.delim(sprintf("%sz.res",lefse_path), header =F,stringsAsFactors=F)
@@ -70,7 +75,7 @@ phylo_LEfSe=function(
     return(outp)
   }
 
-  L7=prodClado(L6) %>% mutate(pvalue=as.numeric(ifelse(V5=="-","",V5)),lv=nchar(as.vector(V1))-nchar(gsub("\\.","",as.vector(V1))),Rank=rank_lv[lv+1]) %>% arrange(lv,V3,pvalue)%>%dplyr::rename(Taxonomy=V1,Group=V3,Statistic=V4)
+  L7=prodClado(L6) %>% mutate(pvalue=as.numeric(ifelse(V5=="-","",V5)),lv=nchar(as.vector(V1))-nchar(gsub("\\.","",as.vector(V1))),Rank=rank_lv[lv+1]) %>% arrange(lv,V3,pvalue)%>%dplyr::rename(Taxonomy=V1,Group=V3,`LDA SCORE (log 10)`=V4)
 
   for(i in 1:3){
     cladofn=sprintf("%sz.%s",lefse_path,figure_format[i])
@@ -79,9 +84,18 @@ phylo_LEfSe=function(
       file.copy(from=cladofn,to=file.path(save_path,sprintf("LEfSe_%s.%s",g1,figure_format[i])),overwrite=T)
       file.remove(sprintf("%sz.%s",lefse_path,figure_format[i]))
     }
+    barchartfn=sprintf("%sBarChart.%s",lefse_path,figure_format[i])
+    if(file.exists(barchartfn)) {
+      file.copy(from=barchartfn,to=file.path(save_path,sprintf("LEfSe_BarChart_%s.%s",g1,figure_format[i])),overwrite=T)
+      file.remove(sprintf("%sBarChart.%s",lefse_path,figure_format[i]))
+    }
   }
 
-  L8=melt(L5,id.vars="class", measure.vars=colnames(L5)[colnames(L5)!="class"],variable.name = "ID",value.name = "value") %>% mutate_each(funs(as.character),ID) %>% left_join(data.frame(ID=sample_names(phylo),g1=get_variable(phylo,g1),stringsAsFactors = F,check.names = F),by="ID") %>% group_by(class,g1) %>% summarise(mean=mean(value)) %>% dcast(class~g1,value.var ="mean")
+  file.remove(sprintf("%sz.txt",lefse_path))
+  file.remove(sprintf("%sz.in",lefse_path))
+  file.remove(sprintf("%sz.res",lefse_path))
+
+  L8=melt(L5,id.vars="class", measure.vars=colnames(L5)[colnames(L5)!="class"],variable.name = "ID",value.name = "value") %>% mutate_at(funs(as.character),.vars="ID") %>% left_join(data.frame(ID=sample_names(phylo),g1=get_variable(phylo,g1),stringsAsFactors = F,check.names = F),by="ID") %>% group_by(class,g1) %>% summarise(mean=mean(value)) %>% dcast(class~g1,value.var ="mean")
 
   L9=melt(L8, id.vars="class",variable.name = "Group",value.name = "mean")%>%mutate(logmean=ifelse(mean==0,log2(.001),log2(mean)))%>%group_by(class)%>%summarise(meandiff=max(mean)-min(mean),log2meandiff=max(logmean)-min(logmean))%>%right_join(L8,by="class") %>% mutate(Taxonomy=gsub("\\|","\\.",class)%>%gsub("\\[","_",.)%>%gsub("\\]","_",.)%>%gsub("-","_",.)%>%gsub(" ","",.),meanlog10diff=log10(meandiff))
 
