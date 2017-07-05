@@ -29,11 +29,12 @@ my_tax_glom=function(phylo,ranklv,NArm=F){
   v1=tax_table(phylo) %>>% data.frame(stringsAsFactors=F) %>>%
     rownames_to_column("OTU") %>>%
     mutate(OTU=factor(OTU,levels=taxa_names(phylo)))
-  #每組taxid以加總Sample最多的來取代, 可能有些情況需再釐清, (1)跳層表現量最多變成另一個ID{不會}, (2)若有相同表現量應取哪個ID(第一次出現的那一個)
+  #每組taxid以加總Sample後reads最多的來取代, 可能有些情況需再釐清, (1)跳層表現量最多變成另一個ID{不會}, (2)若有相同表現量應取哪個ID(第一次出現那個)
   u1=left_join(v0,v1,by="OTU") %>>%
     select_(.dots=c("OTU","Sample","Abundance",keep_rank)) %>>%
     data.table()
   u11=u1[,.(Abundance=sum(Abundance)),by=c("OTU",keep_rank)]
+  setkey(u11,OTU)
   u12=u11[u11[,.I[which.max(Abundance)],by=keep_rank]$V1]
   u13=left_join(select(u1,-OTU),select(u12,-Abundance),by=keep_rank)
   u1=as.data.table(u13)
