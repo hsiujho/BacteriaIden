@@ -13,7 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 安裝本套件
 ```{r,eval=FALSE}
+source("https://bioconductor.org/biocLite.R")
+biocLite("phyloseq")
+biocLite("ShortRead")
 require(devtools)
+install_github("mhahsler/rBLAST")
 install_github("hsiujho/BacteriaIden")
 ```
 

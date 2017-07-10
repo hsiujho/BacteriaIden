@@ -69,7 +69,6 @@ my_tax_glom=function(phylo,ranklv,NArm=F){
   if(!is.null(phylo@sam_data)){
     sample_data(u5)=sample_data(phylo)
   }
-  #因為使用相異的OTUID, phy_tree的部分會不同於原始tax_glom的篩選
   return(u5)
 }
 
