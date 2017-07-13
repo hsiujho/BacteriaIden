@@ -11,7 +11,7 @@
 #
 # a0=phylo_DMM(phylo)
 
-phylo_DMM=function(phylo,ranklv="Genus",NArm = F
+phylo_DMM=function(phylo,ranklv="Genus",NArm = F, maxpartitions=10
                    ,mothur_path="E:/soft/Mothur.win_64_1.39.5/mothur",Num_thread=1){
 
   c0=my_tax_glom(phylo,ranklv,NArm = NArm)
@@ -37,7 +37,7 @@ phylo_DMM=function(phylo,ranklv="Genus",NArm = F
 
   origin_wd=getwd()
   setwd(mothur_path)
-  system(sprintf('mothur "#get.communitytype(shared=dmm.shared, processors=%i)"',Num_thread),intern = T)
+  system(sprintf('mothur "#get.communitytype(shared=dmm.shared, maxpartitions=%i, processors=%i)"',maxpartitions,Num_thread),intern = T)
   setwd(origin_wd)
 
   t0=tax_table(c0)@.Data %>>%
