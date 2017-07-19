@@ -36,7 +36,7 @@ my_tax_glom=function(phylo,ranklv,NArm=F){
   u11=u1[,.(Abundance=sum(Abundance)),by=c("OTU",keep_rank)]
   setkey(u11,OTU)
   u12=u11[u11[,.I[which.max(Abundance)],by=keep_rank]$V1]
-  u13=left_join(select(u1,-OTU),select(u12,-Abundance),by=keep_rank)
+  u13=left_join(dplyr::select(u1,-OTU),dplyr::select(u12,-Abundance),by=keep_rank)
   u1=as.data.table(u13)
   #統一相同taxon的編號, 指定by且使用:=操作, 資料不會化簡
   if(NArm){
