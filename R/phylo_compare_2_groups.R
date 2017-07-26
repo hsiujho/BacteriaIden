@@ -19,7 +19,7 @@ phylo_compare_2_groups=function(phylo,group.var){
 
   e0 = phylo %>>% psmelt()
 
-  e1=e0 %>>% group_by(OTU) %>>% do(k0=anova(lm(Abundance~gv,data=.))$`Pr(>F)`[1]) %>>% summarise(OTU,pvalue=k0) %>>% setNames(c("ID","pvalue_t.test"))
+  e1=e0 %>>% group_by(OTU) %>>% do(k0=anova(lm(Abundance~gv,data=.))$`Pr(>F)`[1]) %>>% summarise(OTU,pvalue=k0[1]) %>>% setNames(c("ID","pvalue_t.test"))
 
   e2=e0 %>>% group_by(OTU,gv) %>>% summarise(Mean=mean(Abundance)) %>>% dcast(OTU~gv,value.var="Mean") %>>% setNames(c("ID",paste0(colnames(.)[-1],"_mean")))
 
