@@ -21,9 +21,9 @@ my_tax_glom=function(phylo,ranklv,NArm=F){
   #   select_(.dots=c("OTU","Sample","Abundance",keep_rank)) %>>%
   #   data.table()
   v0=otu_table(phylo) %>>%
-    melt(varnames=varnames,value.name="Abundance") %>>%
+    melt(varnames=varnames,value.name="Abundance",as.is=T) %>>%
     filter(Abundance>0) %>>%
-    mutate_at(funs(as.character),.vars=c("OTU","Sample")) %>>%
+    # mutate_at(funs(as.character),.vars=c("OTU","Sample")) %>>%
     mutate(OTU=factor(OTU,levels=taxa_names(phylo))
            ,Sample=factor(Sample,levels=sample_names(phylo)))
   v1=tax_table(phylo) %>>% data.frame(stringsAsFactors=F) %>>%

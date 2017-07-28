@@ -7,5 +7,5 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
-Depends:XML,data.table,ape,wordcloud,ggdendro,pheatmap,bigmemory,VennDiagram,readr,R.utils,reshape2,magrittr,parallel,Biostrings,rBLAST,ShortRead,phyloseq,ggplot2,RColorBrewer,rentrez,grid,gridExtra,vegan,ade4,pipeR,ggrepel,tibble,dplyr
-LinkingTo:XML,data.table,ape,wordcloud,ggdendro,pheatmap,bigmemory,VennDiagram,readr,R.utils,reshape2,magrittr,parallel,Biostrings,rBLAST,ShortRead,phyloseq,ggplot2,RColorBrewer,rentrez,grid,gridExtra,vegan,ade4,pipeR,ggrepel,tibble,dplyr
+Depends:clusterSim,XML,data.table,ape,wordcloud,ggdendro,pheatmap,bigmemory,VennDiagram,readr,R.utils,reshape2,magrittr,parallel,Biostrings,rBLAST,ShortRead,phyloseq,ggplot2,RColorBrewer,rentrez,grid,gridExtra,vegan,ade4,pipeR,ggrepel,tibble,dplyr
+LinkingTo:clusterSim,XML,data.table,ape,wordcloud,ggdendro,pheatmap,bigmemory,VennDiagram,readr,R.utils,reshape2,magrittr,parallel,Biostrings,rBLAST,ShortRead,phyloseq,ggplot2,RColorBrewer,rentrez,grid,gridExtra,vegan,ade4,pipeR,ggrepel,tibble,dplyr
