@@ -48,8 +48,8 @@ phylo_LEfSe=function(
     owd=getwd()
     setwd(lefse_path)
     #以下為LEfSe分析步驟, 參數設定請看各程式碼的檔案
-    system("python format_input.py z.txt z.in -c 1 -s -1 -u -1 -o 1000000",intern =T)
-    system("python run_lefse.py z.in z.res -y 0",intern =T)
+    system("c:/python27/python format_input.py z.txt z.in -c 1 -s -1 -u -1 -o 1000000",intern =T)
+    system("c:/python27/python run_lefse.py z.in z.res -y 0",intern =T)
     #-y 1篩選條件嚴格, -y 0不嚴格
     para=sprintf("%s %s %s %s"
                  , sprintf("--labeled_stop_lev %i",labeled_stop_lev) #標籤顯示到第六層級
@@ -61,13 +61,13 @@ phylo_LEfSe=function(
     )
 
     for(i in 1:3){
-      tx1=sprintf("python plot_cladogram.py z.res z.%s --dpi 300 --format %s",figure_format[i],figure_format[i])
+      tx1=sprintf("c:/python27/python plot_cladogram.py z.res z.%s --dpi 300 --format %s",figure_format[i],figure_format[i])
       system(sprintf('%s %s',tx1,para), intern =T )
     }
     # BarChart of LDA score (log10)
-    system("python plot_res.py z.res BarChart.png --dpi 300",intern =T)
-    system("python plot_res.py z.res BarChart.pdf --format pdf",intern =T)
-    system("python plot_res.py z.res BarChart.svg --format svg",intern =T)
+    system("c:/python27/python plot_res.py z.res BarChart.png --dpi 300",intern =T)
+    system("c:/python27/python plot_res.py z.res BarChart.pdf --format pdf",intern =T)
+    system("c:/python27/python plot_res.py z.res BarChart.svg --format svg",intern =T)
 
     #LEfSe輸出存放路徑
     outp=read.delim(sprintf("%sz.res",lefse_path), header =F,stringsAsFactors=F)
