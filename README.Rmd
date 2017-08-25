@@ -19,6 +19,7 @@ biocLite("ShortRead")
 biocLite("DirichletMultinomial")
 require(devtools)
 install_github("mhahsler/rBLAST")
+install_github("hsiujho/distRcpp")
 install_github("hsiujho/BacteriaIden")
 ```
 
