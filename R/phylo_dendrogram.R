@@ -17,7 +17,7 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
   hcdata <- dendro_data(hc, type=type)
   p1=ggplot() +
     geom_segment(data=segment(hcdata), aes(x=x, y=y, xend=xend, yend=yend)) +
-    theme_dendro()+theme(axis.title=element_blank())
+    theme_dendro()#+theme(axis.title=element_blank())
   p1=p1+
     scale_x_continuous(breaks=1:nrow(label(hcdata)),labels=label(hcdata)$label)
 
@@ -38,15 +38,21 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
         if(autolegend){
           a2=p2$theme$axis.text.x$colour %>>%
             (data.frame(levels(.),1:nlevels(.)
-                        ,x=ggplot_build(p2)$panel$ranges[[1]]$x.range[2]
-                        ,y=ggplot_build(p2)$panel$ranges[[1]]$y.range[2]) %>%
+                        # ,x=ggplot_build(p2)$panel$ranges[[1]]$x.range[2]
+                        # ,y=ggplot_build(p2)$panel$ranges[[1]]$y.range[2]
+                        ,x=ggplot_build(p2)$layout$panel_ranges[[1]]$x.range[2]
+                        ,y=ggplot_build(p2)$layout$panel_ranges[[1]]$y.range[2]
+                      ) %>%
                setNames(c(group_var,"i","x","y")))
           #ggplot_build(p2)$panel$ranges[[1]]$y.range
           #ggplot_build(p2)$panel$ranges[[1]]$x.range
           plot(hc)
           a3=wordlayout(x=a2$x, y=a2$y, words=a2$group
-                        ,xlim=ggplot_build(p2)$panel$ranges[[1]]$x.range
-                        ,ylim=ggplot_build(p2)$panel$ranges[[1]]$y.range) %>%
+                        # ,xlim=ggplot_build(p2)$panel$ranges[[1]]$x.range
+                        # ,ylim=ggplot_build(p2)$panel$ranges[[1]]$y.range
+                        ,xlim=ggplot_build(p2)$layout$panel_ranges[[1]]$x.range
+                        ,ylim=ggplot_build(p2)$layout$panel_ranges[[1]]$y.range
+                      ) %>%
             data.frame() %>% rownames_to_column(group_var)
           dev.off()
           a2$yj=a2$y-a2$i*a3$ht-(a2$i-1)*a3$ht/3

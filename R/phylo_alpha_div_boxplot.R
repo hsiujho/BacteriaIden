@@ -8,7 +8,7 @@
 phylo_alpha_div_boxplot=function(phylo,ranklv,group_var){
   if(missing(ranklv)) ranklv="OTU"
   if(any(rank_names(phylo)==ranklv)) {
-    a0=tax_glom(phylo,ranklv,NArm=F)
+    a0=my_tax_glom(phylo,ranklv,NArm=F)
   } else {
     a0=phylo
   }
