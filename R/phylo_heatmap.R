@@ -6,13 +6,13 @@
 #
 
 phylo_heatmap=function(phylo,ranklv="Genus",topn=20,anno_var,...){
-  a0=phylo %>>% transform_sample_counts(function(x)x/sum(x)*100) %>>% tax_glom(ranklv,NArm=F)
+  a0=phylo %>>% transform_sample_counts(function(x)x/sum(x)*100) %>>% my_tax_glom(ranklv,NArm=F)
   b0=taxa_sums(a0) %>>% sort.default(decreasing=T) %>>% names() %>>% "["(1:topn)
   a1=prune_taxa(taxa_names(a0)%in%b0,a0)
   #    subset_taxa(a0,taxa_names(a0)%in%b0)
 
   rankv=rank_names(phylo)[1:which(rank_names(phylo)==ranklv)]
-  a2=psmelt(a1) %>>% mutate_each_(funs(as.character),rankv)
+  a2=psmelt(a1) %>>% mutate_at(.vars=rankv,funs(as.character))
 
   for(i in 2:length(rankv)){
     j=rankv[i]
