@@ -7,7 +7,7 @@
 
 phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",type="rectangle",autolegend=T){
   if(any(rank_names(phylo)==ranklv)){
-    phylo%<>%tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
+    phylo%<>%my_tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
   }
   if(toRA){
     phylo%<>%transform_sample_counts(function(x)x/sum(x)*100)
@@ -28,7 +28,8 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
           data.frame(stringsAsFactors=F) %>%
           setNames(group_var)
         rownames(a0)=sample_names(phylo)
-        a1=rownames_to_column(a0,"label")
+        a1=rownames_to_column(a0,"label") %>>%
+          mutate(label=factor(label,levels = hcdata$label$label))
         hcdata$label%<>%left_join(a1,by="label")
 
         p2=p1+
@@ -40,9 +41,11 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
             (data.frame(levels(.),1:nlevels(.)
                         # ,x=ggplot_build(p2)$panel$ranges[[1]]$x.range[2]
                         # ,y=ggplot_build(p2)$panel$ranges[[1]]$y.range[2]
-                        ,x=ggplot_build(p2)$layout$panel_ranges[[1]]$x.range[2]
-                        ,y=ggplot_build(p2)$layout$panel_ranges[[1]]$y.range[2]
-                      ) %>%
+                        # ,x=ggplot_build(p2)$layout$panel_ranges[[1]]$x.range[2]
+                        # ,y=ggplot_build(p2)$layout$panel_ranges[[1]]$y.range[2]
+                        ,x=ggplot_build(p2)$layout$panel_params[[1]]$x.range[2]
+                        ,y=ggplot_build(p2)$layout$panel_params[[1]]$y.range[2]
+            ) %>%
                setNames(c(group_var,"i","x","y")))
           #ggplot_build(p2)$panel$ranges[[1]]$y.range
           #ggplot_build(p2)$panel$ranges[[1]]$x.range
@@ -50,9 +53,11 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
           a3=wordlayout(x=a2$x, y=a2$y, words=a2$group
                         # ,xlim=ggplot_build(p2)$panel$ranges[[1]]$x.range
                         # ,ylim=ggplot_build(p2)$panel$ranges[[1]]$y.range
-                        ,xlim=ggplot_build(p2)$layout$panel_ranges[[1]]$x.range
-                        ,ylim=ggplot_build(p2)$layout$panel_ranges[[1]]$y.range
-                      ) %>%
+                        # ,xlim=ggplot_build(p2)$layout$panel_ranges[[1]]$x.range
+                        # ,ylim=ggplot_build(p2)$layout$panel_ranges[[1]]$y.range
+                        ,xlim=ggplot_build(p2)$layout$panel_params[[1]]$x.range
+                        ,ylim=ggplot_build(p2)$layout$panel_params[[1]]$y.range
+          ) %>%
             data.frame() %>% rownames_to_column(group_var)
           dev.off()
           a2$yj=a2$y-a2$i*a3$ht-(a2$i-1)*a3$ht/3
