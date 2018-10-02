@@ -16,10 +16,10 @@ phylo_div_boxplot=function(phylo,group.varn=""){
   sample_data(phylo)$SampleID=sample_names(phylo)
 
   b1=lapply(c("Phylum","Genus"),function(x){
-    tax_glom(phylo,x,NArm=F) %>%
-      estimate_richness() %>% add_rownames("Subjects") %>%
+    my_tax_glom(phylo,x,NArm=F) %>%
+      estimate_richness() %>% rownames_to_column("Subjects") %>%
       melt("Subjects",colnames(.)[-1],"Index") %>% mutate(Rank=x)
-  }) %>% bind_rows() %>% mutate_each(funs(as.character),Index) %>% filter(!Index%in%c("se.chao1","ACE","se.ACE")) %>%
+  }) %>% bind_rows() %>% mutate_at(.vars="Index",funs(as.character)) %>% filter(!Index%in%c("se.chao1","ACE","se.ACE")) %>%
     mutate(Rank=factor(Rank,levels=c("Phylum","Genus"))
            ,Index=factor(Index,levels=c("Shannon","Simpson","InvSimpson","Observed","Chao1","Fisher"))
            ,SampleID=gsub("\\.","-",Subjects)) %>%
@@ -32,3 +32,6 @@ phylo_div_boxplot=function(phylo,group.varn=""){
 
   grid.arrange(p1,p2,ncol=2)
 }
+
+#data(GlobalPatterns)
+#c0=phylo_div_boxplot(GlobalPatterns,group.varn="SampleType")
