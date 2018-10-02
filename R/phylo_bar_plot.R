@@ -26,6 +26,7 @@ phylo_bar_plot=function(
   p2=group_by_at(p1,.vars=fillv) %>>%
     summarise(Abundance=sum(Abundance)) %>>%
     arrange(desc(Abundance)) %>>%
+    ungroup() %>>%
     top_n(topn,Abundance) %>>%
     "[["(fill) %>>%
     as.character()
