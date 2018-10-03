@@ -5,7 +5,7 @@
 #
 #
 
-phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",type="rectangle",autolegend=T){
+phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",dist_method="bray",type="rectangle",autolegend=T){
   if(any(rank_names(phylo)==ranklv)){
     phylo%<>%my_tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
   }
@@ -13,7 +13,8 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
     phylo%<>%transform_sample_counts(function(x)x/sum(x)*100)
   }
 
-  hc <- otu_table(phylo)@.Data %>% t() %>% dist() %>% hclust(method=method)
+#  hc <- otu_table(phylo)@.Data %>% t() %>% dist() %>% hclust(method=method)
+  hc <- otu_table(phylo)@.Data %>% t() %>% vegdist(method=dist_method) %>% hclust(method=method)
   hcdata <- dendro_data(hc, type=type)
   p1=ggplot() +
     geom_segment(data=segment(hcdata), aes(x=x, y=y, xend=xend, yend=yend)) +
