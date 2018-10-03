@@ -13,7 +13,7 @@ phylo_dendro_bar_2=function(phylo,ranklv="Phylum",topn=6
                             ,group_height=5
                             ,group_grid=1
                             ,group_ymax=-2
-                            ,hc_method="complete"
+                            ,hc_method="ward.D"
                             ,dist_method="bray"
 ){
   #  ranklv="Class"
