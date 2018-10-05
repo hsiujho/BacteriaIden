@@ -15,6 +15,8 @@ phylo_dendro_bar_2=function(phylo,ranklv="Phylum",topn=6
                             ,group_ymax=-2
                             ,hc_method="ward.D"
                             ,dist_method="bray"
+                            ,cell_border_colour="black"
+                            ,cell_border_size=0.5
 ){
   #  ranklv="Class"
   if(!"SampleID"%in%sample_variables(phylo)){
@@ -50,7 +52,7 @@ phylo_dendro_bar_2=function(phylo,ranklv="Phylum",topn=6
     up/down*dendro_height+dendro_ymin
   }
   p0=ggplot(c3,aes_string(xmin="xmin",xmax="xmax",ymin="ymin",ymax="ymax",fill=ranklv))+
-    geom_rect(colour="gray")
+    geom_rect(colour=cell_border_colour,size=cell_border_size)
   p1=p0+
     geom_segment(aes(x=x,y=shrink_y(y)
                      ,xend=xend,yend=shrink_y(yend))
@@ -97,7 +99,8 @@ phylo_dendro_bar_2=function(phylo,ranklv="Phylum",topn=6
       for(l in 1:NROW(df_col)){
         p2=p2+geom_rect(data=filter_at(df,group_var[k],all_vars(.==df_col$item[l]))
                         ,mapping=aes(xmin=x1,xmax=x2,ymin=y1,ymax=y2)
-                        ,colour="gray"
+                        ,colour=cell_border_colour
+                        ,size=cell_border_size
                         ,inherit.aes = F,fill=df_col$col_id[l])
       }
     }
@@ -126,7 +129,7 @@ function(){
   phylo=subset_samples(MS16036_gg_phylo
                        ,group%in%c("N","NE","N_FNE")&ST=="After") %>>%
     (prune_taxa(taxa_sums(.)>0,.))
-  p1=phylo_dendro_bar_2(phylo,ranklv="Phylum")
+  p1=phylo_dendro_bar_2(phylo,ranklv="Phylum",cell_border_colour = "gray")
   p1=phylo_dendro_bar_2(phylo,ranklv="Class",topn=10)
   p1=phylo_dendro_bar_2(phylo,ranklv="Genus",topn=15)
 
