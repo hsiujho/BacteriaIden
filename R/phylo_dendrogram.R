@@ -5,7 +5,16 @@
 #
 #
 
-phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",dist_method="bray",type="rectangle",autolegend=T){
+phylo_dendrogram=function(phylo
+                          ,group_var
+                          ,toRA=T
+                          ,ranklv="OTU"
+                          ,method="complete"
+                          ,dist_method="bray"
+                          ,type="rectangle"
+                          ,autolegend=T
+                          ,using_path=T
+                          ){
   if(any(rank_names(phylo)==ranklv)){
     phylo%<>%my_tax_glom(ranklv,NArm=F)%>>%(prune_taxa(taxa_sums(.)>0,.))
   }
@@ -19,6 +28,28 @@ phylo_dendrogram=function(phylo,group_var,toRA=T,ranklv="OTU",method="complete",
   p1=ggplot() +
     geom_segment(data=segment(hcdata), aes(x=x, y=y, xend=xend, yend=yend)) +
     theme_dendro()#+theme(axis.title=element_blank())
+  if(using_path){
+    b2=segment(hcdata)
+    b3=NULL
+    for(i in 1:NROW(b2)){
+      if(i==1){
+        b2$k[i]=1
+      } else {
+        if(all(b2[i,c("x","y")]==b2[i-1,c("xend","yend")])){
+          b2$k[i]=b2$k[i-1]
+        } else {
+          b2$k[i]=b2$k[i-1]+1
+        }
+      }
+      tab1=b2[i,c("x","y","k"),drop=F]
+      tab2=b2[i,c("xend","yend","k"),drop=F] %>>%
+        setNames(c("x","y","k"))
+      b3=bind_rows(b3,tab1,tab2)
+    }
+    p1=ggplot(unique(b3),aes(x=x,y=y,group=k))+
+      geom_path()+
+      theme_dendro()
+  }
   p1=p1+
     scale_x_continuous(breaks=1:nrow(label(hcdata)),labels=label(hcdata)$label)
 
