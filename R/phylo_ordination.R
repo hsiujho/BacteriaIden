@@ -80,8 +80,10 @@ phylo_ordination=function(phylo,ranklv,toRA=T
   if(rtest.nrepet>0){
 #    xlim=ggplot_build(p1)$panel$ranges[[1]]$x.range
 #    ylim=ggplot_build(p1)$panel$ranges[[1]]$y.range
-    xlim=ggplot_build(p1)$layout$panel_ranges[[1]]$x.range
-    ylim=ggplot_build(p1)$layout$panel_ranges[[1]]$y.range
+    # xlim=ggplot_build(p1)$layout$panel_ranges[[1]]$x.range
+    # ylim=ggplot_build(p1)$layout$panel_ranges[[1]]$y.range
+    xlim=ggplot_build(p1)$layout$panel_params[[1]]$x.range
+    ylim=ggplot_build(p1)$layout$panel_params[[1]]$y.range
     p1=p1+annotate("text",x=xlim[1],y=ylim[2],label=pvalue,hjust=0)
   }
   return(p1)

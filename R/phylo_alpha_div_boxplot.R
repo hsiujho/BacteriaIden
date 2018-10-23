@@ -13,7 +13,12 @@ phylo_alpha_div_boxplot=function(phylo,ranklv,group_var){
     a0=phylo
   }
   index=c("Observed","Chao1","Shannon","Simpson","InvSimpson")
-  a1=a0 %>% estimate_richness(measures=index) %>% rownames_to_column("Subjects") %>% mutate(SampleID=gsub("\\.","-",Subjects)) %>% melt("SampleID",index,"Index")
+# sample_names 由數字開頭會在名稱前端增加"X"字元, 特殊符號會被轉換成"."
+  a1=estimate_richness(a0,measures=index) %>%
+    rownames_to_column("Subjects") %>%
+    mutate(SampleID=gsub("\\.","-",Subjects) %>>%
+             (ifelse(grepl("^\\d.*",sample_names(a0)),gsub("^X","",.),.))) %>%
+    melt("SampleID",index,"Index")
 
   ylabtext=ifelse(any(rank_names(phylo)==ranklv),sprintf("Expression at %s level",ranklv),"Expression at OTU level")
   if(missing(group_var)) group_var=""
