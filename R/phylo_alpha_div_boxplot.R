@@ -38,7 +38,7 @@ phylo_alpha_div_boxplot=function(phylo,ranklv,group_var,test_for="mean",add_poin
         do(k1=kruskal.test(test.formula,data=.)
            ,k2=anova(lm(test.formula,data=.))) %>>%
         summarise(Index,median.test.pvalue=k1$p.value
-                  ,mean.pvalue=k2$`Pr(>F)`[1])
+                  ,mean.test.pvalue=k2$`Pr(>F)`[1])
     }
     t2=group_by_at(a1,c("Index",group_var)) %>>%
       summarise(N=length(value),Mean=mean(value),Median=median(value))
